@@ -20,7 +20,7 @@ public class Hash {
 
         // Task: Hash a given string using MD5 and return the result as a BigInteger.
 
-		String digest = null;
+        String digest = null;
 
         // we use MD5 with 128 bits digest
 
@@ -42,17 +42,12 @@ public class Hash {
         byte[] theMD5digest = md.digest(bytesOfMessage);
 
         // convert the hash into hex format
-
-		StringBuilder sb = new StringBuilder(2*theMD5digest.length);
-		for (byte b : theMD5digest){
-			sb.append(String.format("%02x", b&0xff));
-		}
-
-		digest = sb.toString();
+        
+        digest = toHex(theMD5digest).toString();
 
         // convert the hex into BigInteger
 
-		hashint = new BigInteger(digest, 16);
+        hashint = new BigInteger(digest, 16);
 
         // return the BigInteger
 
@@ -68,10 +63,10 @@ public class Hash {
         // compute the number of bits = digest length * 8
 
         // compute the address size = 2 ^ number of bits
-
+        BigInteger addressSize = new BigInteger(String.valueOf(Math.pow(2, bitSize())));
         // return the address size
 
-        return null;
+        return addressSize;
     }
 
     public static int bitSize() {
@@ -79,6 +74,7 @@ public class Hash {
         int digestlen = 0;
 
         // find the digest length
+        digestlen = hashint.bitLength();
 
         return digestlen * 8;
     }
