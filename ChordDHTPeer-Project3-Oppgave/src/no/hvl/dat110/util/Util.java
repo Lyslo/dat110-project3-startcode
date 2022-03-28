@@ -11,6 +11,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,15 +38,28 @@ public class Util {
 	 * @return true if (lower <= id <= upper) or false otherwise
 	 */
 	public static boolean computeLogic(BigInteger id, BigInteger lower, BigInteger upper) {
-		
-		// a formula to check whether an id falls within the set {lower, upper} using the address size as our bound (modulos operation)
-		// it modifies 'upper' and 'id' when lower > upper e.g. set (6, 2) in mod 10 = {6, 7, 8, 9, 0, 1, 2}
-		
-		// implement: read the descriptions above
-		boolean cond = false;
 
-		
-		return cond;
+		// Get the address size
+		BigInteger asize = Hash.addressSize();
+
+		// Find the mods:
+		BigInteger lowerMod = lower.mod(asize);
+		BigInteger upperMod = upper.mod(asize);
+		BigInteger idMod = id.mod(asize);
+
+		if (lowerMod.compareTo(upperMod) > 0) { // lower > upper
+			// lower <= id <= upper blir til:
+			// lower <= id < asize || 0 <= id <= upper blir til
+			// (lower <= id && id < asize) || (0 <= id && id <= upper)
+			return ((lowerMod.compareTo(idMod) <= 0 && idMod.compareTo(asize) < 0)
+					|| (BigInteger.valueOf(0).compareTo(idMod) <= 0 && idMod.compareTo(upperMod) <= 0));
+		} else if (lowerMod.compareTo(upperMod) < 0){
+			// Sjekker om lower <= id <= upper blir til
+			// lower <= id && id <= upper
+			return (lowerMod.compareTo(idMod) <= 0 && idMod.compareTo(upperMod) <= 0);
+		} else {
+			return lowerMod.compareTo(idMod) == 0;
+		}
 	}
 	
 	public static List<String> toString(List<NodeInterface> list) throws RemoteException {
