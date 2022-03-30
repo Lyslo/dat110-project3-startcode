@@ -17,6 +17,7 @@ import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import no.hvl.dat110.middleware.Message;
 import no.hvl.dat110.rpc.interfaces.NodeInterface;
@@ -72,26 +73,44 @@ public class FileManager {
      *
      * @throws RemoteException 
      */
-    public int distributeReplicastoPeers() throws RemoteException {
-    	int counter = 0;
-    	
-    	// Task1: Given a filename, make replicas and distribute them to all active peers such that: pred < replica <= peer
-    	
-    	// Task2: assign a replica as the primary for this file. Hint, see the slide (project 3) on Canvas
-    	
-    	// create replicas of the filename
-    	
+    public int distributeReplicastoPeers() throws RemoteException, NoSuchAlgorithmException {
+		int counter = 0;
+
+		// Task1: Given a filename, make replicas and distribute them to all active
+		// peers such that: pred < replica <= peer
+
+		// Task2: assign a replica as the primary for this file. Hint, see the slide
+		// (project 3) on Canvas
+		Random rnd = new Random();
+		int ind = rnd.nextInt(Util.numReplicas - 1);
+
+		// create replicas of the filename
+		createReplicaFiles();
+
+		int randomNum = ThreadLocalRandom.current().nextInt(0, replicafiles.length);
+
 		// iterate over the replicas
-    	
-    	// for each replica, find its successor by performing findSuccessor(replica)
-    	
-    	// call the addKey on the successor and add the replica
-    	
-    	// call the saveFileContent() on the successor
-    	
-    	// increment counter
-    	
-    		
+
+		for (BigInteger fileId : replicafiles) {
+
+			// for each replica, find its successor by performing findSuccessor(replica)
+			NodeInterface successor = chordnode.findSuccessor(fileId);
+
+			// call the addKey on the successor and add the replica
+			successor.addKey(fileId);
+
+			// call the saveFileContent() on the successor
+			if (counter == ind) {
+				successor.saveFileContent(filename, fileId, bytesOfFile, true);
+			} else {
+				successor.saveFileContent(filename, fileId, bytesOfFile, false);
+			}
+
+			// increment counter
+			counter++;
+
+		}
+
 		return counter;
     }
 	
