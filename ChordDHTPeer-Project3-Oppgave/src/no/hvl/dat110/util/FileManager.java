@@ -161,17 +161,17 @@ public class FileManager {
 		// is holding the primary copy
 
 		// iterate over the activeNodesforFile
-//		Set<Message> aktiveNoder = getActiveNodesforFile();
-		Set<Message> aktiveNoder = requestActiveNodesForFile(this.filename);
+//
+		Set<Message> activeNodes = requestActiveNodesForFile(this.filename);
 
 		// for each active peer (saved as Message)
-		for (Message m : aktiveNoder) {
+		for (Message m : activeNodes) {
 
 			// use the primaryServer boolean variable contained in the Message class to
 			// check if it is the primary or not
 			if (m.isPrimaryServer()) {
-//				m.getHashOfFile();
-				return this.chordnode.findSuccessor(m.getHashOfFile());// m.getNodeID());
+//
+				return this.chordnode.findSuccessor(m.getHashOfFile());//
 			}
 
 			// return the primary
