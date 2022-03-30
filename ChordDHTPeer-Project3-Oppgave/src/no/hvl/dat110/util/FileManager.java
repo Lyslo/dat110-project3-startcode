@@ -121,23 +121,33 @@ public class FileManager {
 	 * @throws RemoteException 
 	 */
 	public Set<Message> requestActiveNodesForFile(String filename) throws RemoteException {
-		
+
+
 		this.filename = filename;
 		Set<Message> succinfo = new HashSet<Message>();
 		// Task: Given a filename, find all the peers that hold a copy of this file
-		
+
 		// generate the N replicas from the filename by calling createReplicaFiles()
-		
+		createReplicaFiles();
+
 		// it means, iterate over the replicas of the file
-		
-		// for each replica, do findSuccessor(replica) that returns successor s.
-		
-		// get the metadata (Message) of the replica from the successor, s (i.e. active peer) of the file
-		
-		// save the metadata in the set succinfo.
-		
+		for (BigInteger e : replicafiles) {
+			// for each replica, do findSuccessor(replica) that returns successor s.
+
+			NodeInterface successor = chordnode.findSuccessor(e);
+
+			// get the metadata (Message) of the replica from the successor, s (i.e. active
+			// peer) of the file
+
+			Message m = successor.getFilesMetadata(e);
+
+			// save the metadata in the set succinfo.
+
+			succinfo.add(m);
+
+		}
 		this.activeNodesforFile = succinfo;
-		
+
 		return succinfo;
 	}
 	
@@ -145,19 +155,29 @@ public class FileManager {
 	 * Find the primary server - Remote-Write Protocol
 	 * @return 
 	 */
-	public NodeInterface findPrimaryOfItem() {
+	public NodeInterface findPrimaryOfItem() throws RemoteException {
 
-		// Task: Given all the active peers of a file (activeNodesforFile()), find which is holding the primary copy
-		
+		// Task: Given all the active peers of a file (activeNodesforFile()), find which
+		// is holding the primary copy
+
 		// iterate over the activeNodesforFile
-		
+//		Set<Message> aktiveNoder = getActiveNodesforFile();
+		Set<Message> aktiveNoder = requestActiveNodesForFile(this.filename);
+
 		// for each active peer (saved as Message)
-		
-		// use the primaryServer boolean variable contained in the Message class to check if it is the primary or not
-		
-		// return the primary
-		
-		return null; 
+		for (Message m : aktiveNoder) {
+
+			// use the primaryServer boolean variable contained in the Message class to
+			// check if it is the primary or not
+			if (m.isPrimaryServer()) {
+//				m.getHashOfFile();
+				return this.chordnode.findSuccessor(m.getHashOfFile());// m.getNodeID());
+			}
+
+			// return the primary
+		}
+
+		return null;
 	}
 	
     /**
