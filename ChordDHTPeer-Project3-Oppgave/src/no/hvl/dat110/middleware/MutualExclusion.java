@@ -218,11 +218,11 @@ public class MutualExclusion {
 			default:
 				break;
 		}
-		
+
 	}
 	
 	public void onMutexAcknowledgementReceived(Message message) throws RemoteException {
-		
+
 		// add message to queueack
 		this.queueack.add(message);
 		
@@ -249,7 +249,7 @@ public class MutualExclusion {
 		// clear the queueack
 		this.queueack.clear();
 
-		// return true if yes and false if no
+		// returntrue if yes and false if no
 
 		return allM;
 	}
